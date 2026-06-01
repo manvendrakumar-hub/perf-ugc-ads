@@ -1,0 +1,22 @@
+# SECRETS — never commit
+.secrets/
+*.token.json
+token.json
+service_account.json
+*client_secret*.json
+
+# OS / cruft
+.DS_Store
+**/.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
+node_modules/
+
+# Large video outputs (these live in Drive; folder structure kept via .gitkeep)
+*.mp4
+*.mov

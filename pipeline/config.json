@@ -1,0 +1,19 @@
+{
+  "service_account_path": "../.secrets/service_account.json",
+  "sheet_id": "1jTywBQAUY4oI8LsccJPOJufLda47zS0wqpgCA38gIHE",
+  "worksheet": "Sheet1",
+  "columns": {
+    "pid": "PID Name",
+    "drive": "Drive Link",
+    "product_page": "Product Detail Page",
+    "claude_script": "Claude Script",
+    "feedback": "Manny's Feedback",
+    "status": "Status",
+    "count": "Count",
+    "style": "Style",
+    "avatar": "Avatar",
+    "video_output": "Video Output",
+    "job_id": "Job ID"
+  },
+  "downloads_dir": "../Ads"
+}
