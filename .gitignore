@@ -20,3 +20,20 @@ node_modules/
 # Large video outputs (these live in Drive; folder structure kept via .gitkeep)
 *.mp4
 *.mov
+
+# Editor / agent local state
+.claude/
+*.lock
+
+# Scratch / QA artifacts (debug clips, thumbnails)
+**/_scratch/
+
+# PII — real-person reference photos. NEVER commit (privacy). Live in Drive only.
+Female face ref/
+
+# Licensed music tracks — live in Drive only, not git (copyright)
+Music/
+*.mp3
+
+# Third-party reference ads (research material; not our deliverables)
+Video ref/
