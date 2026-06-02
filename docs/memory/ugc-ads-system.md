@@ -16,7 +16,7 @@ Building a scalable UGC ad generation system (user is at Lenskart, eyewear). Pha
 **Type taxonomy (A = Product-First, B = Yapping).** Product-First has THREE production formats sharing the same voice/script rules + SLCT output + approval gate, differing only in how they're shot/edited:
 - **A.1 Talking Head** — 🔒 LOCKED (validated PID 131309). Creator straight-to-camera; MS Avatar+Product, single generation. Full recipe in [[higgsfield-ms-generation-recipe]] and the A.1 section of product-first-ugc.md.
 - **A.2 Split Screen Edit** — 🔒 LOCKED (validated PID 135440). Music-driven product-flex montage in stacked split panels (2-split studio / 3-split outdoor), NO talking. Engine: **Seedance 2.0, image refs only**. Full recipe in [[seedance-split-screen-recipe]].
-- **A.3 Product Modelling** — 🚧 in development. Product worn/used on a model, motion/showcase emphasis (eyewear on face, try-on feel).
+- **A.3 Product Modelling** — 🔒 LOCKED (validated PID 140632 John Jacobs sunglasses). Cinematic beauty showcase of the product worn on the face; replicates Pinterest refs. 3 sub-formats: **A3.1** indoor multi-frame try-on, **A3.2** outdoor cinematic jump-cuts (single flex), **A3.3** studio tight portrait. Engine: **Seedance 2.0, image refs, FULL-FRAME** (not split). Recipe + gotchas in [[seedance-split-screen-recipe]].
 A.2/A.3 each get locked only after their first validated render.
 
 **Output format (both types):** numbered ≤15s segments, each = SPOKEN (VO) + ON-SCREEN VISUAL (SLCT: Subject→Lighting/Look→Camera→Technical) + optional caption.

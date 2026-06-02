@@ -27,3 +27,8 @@ How to generate **A.2 Split-Screen Edit** videos (learned 2026-06-02, validated 
 **Models (new fashion identities):** mint via **Nano Banana Pro** (`nano_banana_pro` → routes to nano_banana_2, 1k), **bare-faced** 3:4 studio so Seedance places the real frames. Can seed from face/body refs: upload ref → pass as `image` role to generate_image, prompt "NEW distinct individual inspired by the reference aesthetic." Brighter/fairer skin needs explicit strong prompting + a reference (defaults to medium tan otherwise). Reusable library: project `Ads/_models/` (JJ-A2_male_model_LOCKED, JJ-A2_female_model_LOCKED, lib_female_01..03).
 
 **Poll/download:** `job_status(jobId, sync=true)`; completed → `results.rawUrl`. Locals in `Ads/A2_<pid>_<slug>/raw_higgsfield/`.
+
+**Also drives A.3 Product Modelling (LOCKED 2026-06-02, PID 140632 sunglasses, lib_female_03 model):** same Seedance 2.0 image-refs path but **FULL-FRAME** (no split panels) — beauty showcase of product worn on the face. Sub-formats A3.1 indoor try-on / A3.2 outdoor jump-cuts / A3.3 studio tight portrait. Two extra gotchas learned here:
+- **Pass the product IMAGE media_id** (from media_upload), NOT the Marketing-Studio product-ENTITY uuid → entity uuid fails with "Media input not found". (Model ref = image_job uuid works.)
+- **NSFW false-positive:** full-body "studio shoot / standing / posing model" framing + youthful female model returns status `nsfw` (not charged). Fix = **tight close-up / head-and-shoulders framing** + modest product-led wording; avoid "shoot/full-body/posing". Close-ups pass first try.
+- Transient `MCP server connection lost` errors happen — just re-fire the one job.
