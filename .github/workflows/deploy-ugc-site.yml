@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - agent/ugc-systems-site
     paths:
       - "site/**"
       - ".github/workflows/deploy-ugc-site.yml"
