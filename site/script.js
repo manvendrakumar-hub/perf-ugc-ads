@@ -107,7 +107,7 @@ const mediaLibrary = {
       { title: 'Golden Hour Field · PID 137971', path: 'assets/web-videos/selfserve/golden-hour-field-137971.mp4', poster: 'assets/web-videos/selfserve/golden-hour-field-137971.jpg' },
       { title: 'Poolside · PID 137971', path: 'assets/web-videos/selfserve/poolside-137971.mp4', poster: 'assets/web-videos/selfserve/poolside-137971.jpg' },
       { title: 'Staircase · PID 207370', path: 'assets/web-videos/selfserve/staircase-207370.mp4', poster: 'assets/web-videos/selfserve/staircase-207370.jpg' },
-      { title: 'Boutique · PID 137974', path: 'assets/web-videos/selfserve/boutique-137974.mp4', poster: 'assets/web-videos/selfserve/boutique-137974.jpg' }
+      { title: 'Boutique · PID 137974', path: 'assets/web-videos/selfserve/boutique-137974.mp4', poster: 'assets/web-videos/selfserve/boutique-137974-video-frame.jpg' }
     ]
   },
   th: {
