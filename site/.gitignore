@@ -1,0 +1,9 @@
+.vercel/
+.DS_Store
+README.md
+assets/design-concept.png
+assets/videos/pm-downloads/*.mp4
+assets/videos/th-downloads/*.mp4
+assets/manny-work/lottie-systems/*.mov
+assets/manny-work/app-videos/*.mp4
+assets/manny-work/product-modelling-video-editing/*.mov
