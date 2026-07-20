@@ -30,7 +30,6 @@
       <a href="#motion"><i>10</i>Motion work</a>
       <a href="#thoughts"><i>11</i>Your thoughts?</a>
     </nav>
-    <a class="bella-mini" href="#issues"><span>↗</span><strong>Ask Bella</strong><small>Tool, pipeline or next-step questions.</small></a>
     <p class="sidebar-foot">Build log · July 2026<br>Active R&amp;D, honest status.</p>
   </aside>
 
@@ -119,13 +118,55 @@
           <div><span>Kling generation</span><strong>30 cr</strong><small>Kling 3.0 Pro · 15 sec</small></div>
           <div><span>Seedance generation</span><strong>135 cr</strong><small>Seedance 2.0 · 1080p / 15 sec</small></div>
         </div>
+        <p class="credit-key"><abbr title="credits">cr</abbr> = credits, not crores.</p>
         <p class="source-line">Source: verified in-repo Higgsfield credit ledger, 30 Jun 2026.</p>
-        <div class="sheet-pending"><strong>AI Cost Sheet</strong><span id="sheetStatus">Connected</span><p>Open the live generation-cost sheet to review ₹ / $ operating costs, model pricing, and R&amp;D assumptions.</p><div class="sheet-actions"><button type="button" id="connectSheet">Change link</button><a id="openSheet" href="https://docs.google.com/spreadsheets/d/1pwKUz7le_H1XCs39XjHrisueV7JgGiotsfHTXAbiB5s/edit?gid=1676287141#gid=1676287141" target="_blank" rel="noreferrer">Open sheet ↗</a><a href="docs/higgsfield-credit-pricing.md" target="_blank">Open verified ledger ↗</a></div></div>
-        <div class="calculator">
-          <div><label for="workflow">Planning unit</label><select id="workflow"><option value="30">Kling clip · 30 cr</option><option value="135">Seedance clip · 135 cr</option><option value="7">Try-on still · 7 cr</option></select></div>
-          <div><label for="daily">Daily generations: <output id="dailyOut">10</output></label><input id="daily" type="range" min="1" max="100" value="10"></div>
-          <div><label for="creditRate">Cost per credit</label><div class="rate-field"><select id="currency" aria-label="Currency"><option value="₹">₹</option><option value="$">$</option></select><input id="creditRate" type="number" min="0" step="0.001" placeholder="Add rate"></div></div>
-          <div class="calc-result"><span>Estimated daily usage</span><strong id="creditsOut">300 credits</strong><small id="monthlyOut">9,000 credits / 30 days</small><b id="moneyOut">Add a credit rate for currency cost</b></div>
+        <div class="sheet-pending"><strong>AI Cost Sheet</strong><span>Access controlled</span><p>Open the live generation-cost sheet. Only approved Google accounts can view it.</p><div class="sheet-actions"><a id="openSheet" href="https://docs.google.com/spreadsheets/d/1pwKUz7le_H1XCs39XjHrisueV7JgGiotsfHTXAbiB5s/edit?gid=1676287141#gid=1676287141" target="_blank" rel="noreferrer">Open sheet ↗</a></div></div>
+
+        <div class="calculator-shell">
+          <div class="calc-tabs" role="tablist" aria-label="Cost calculator mode">
+            <button type="button" id="simpleCalcTab" role="tab" aria-selected="true" aria-controls="simpleCalcPanel" data-calc-tab="simple">Simple math</button>
+            <button type="button" id="advancedCalcTab" role="tab" aria-selected="false" aria-controls="advancedCalcPanel" data-calc-tab="advanced">Advanced</button>
+          </div>
+          <section class="calculator-panel" id="simpleCalcPanel" role="tabpanel" aria-labelledby="simpleCalcTab">
+            <div class="calculator">
+              <div><label for="workflow">Planning unit</label><select id="workflow"><option value="30">Kling clip · 30 cr</option><option value="135">Seedance clip · 135 cr</option><option value="7">Try-on still · 7 cr</option></select></div>
+              <div><label for="daily">Daily generations: <output id="dailyOut">10</output></label><input id="daily" type="range" min="1" max="100" value="10"></div>
+              <div><label for="creditRate">Cost per credit</label><div class="rate-field"><select id="currency" aria-label="Currency"><option value="₹">₹</option><option value="$">$</option></select><input id="creditRate" type="number" min="0" step="0.001" placeholder="Add rate"></div></div>
+              <div class="calc-result"><span>Estimated daily usage</span><strong id="creditsOut">300 credits</strong><small id="monthlyOut">9,000 credits / 30 days</small><b id="moneyOut">Add a credit rate for currency cost</b></div>
+            </div>
+          </section>
+          <section class="calculator-panel" id="advancedCalcPanel" role="tabpanel" aria-labelledby="advancedCalcTab" hidden>
+            <p class="advanced-intro">Build a mixed talking-head run. Defaults match the real PID 208504 Type 1 production log.</p>
+            <div class="advanced-mix">
+              <label class="model-slider" for="seedanceMix"><span><strong>Seedance 2.0</strong><small>Hook profile · 99 cr each</small></span><input id="seedanceMix" type="range" min="0" max="8" value="1"><output id="seedanceMixOut">1 video</output></label>
+              <label class="model-slider" for="klingMix"><span><strong>Kling 3.0 Pro</strong><small>Actual seven-clip average · ≈21.14 cr each</small></span><input id="klingMix" type="range" min="0" max="12" value="7"><output id="klingMixOut">7 videos</output></label>
+              <label class="model-slider" for="nanoMix"><span><strong>Nano Banana</strong><small>Character + try-on images · 2 cr each</small></span><input id="nanoMix" type="range" min="0" max="8" value="2"><output id="nanoMixOut">2 images</output></label>
+            </div>
+            <div class="calc-result advanced-result"><span>Estimated mixed-run usage</span><strong id="advancedCreditsOut">251 credits</strong><small id="advancedBreakdownOut">1 Seedance + 7 Kling + 2 Nano Banana generations</small><b id="advancedMoneyOut">$12.55 · ₹1,192.25</b></div>
+          </section>
+        </div>
+
+        <div class="th-cost-block">
+          <div class="cost-block-heading"><h3>Talking-head cost · Type 1</h3><p>Real Higgsfield transaction log mapped to the PID 208504 clip durations—not estimates.</p></div>
+          <div class="cost-table-wrap" tabindex="0" aria-label="Scrollable talking-head generation cost table">
+            <table class="cost-table">
+              <thead><tr><th>Step</th><th>Model used</th><th>Duration</th><th>Current method</th><th>Cost at $0.05 / cr</th><th>All-Seedance comparison</th></tr></thead>
+              <tbody>
+                <tr><td>Character kit frame</td><td>Nano Banana</td><td>—</td><td>2 cr</td><td>$0.10 · ₹9.50</td><td>2 cr</td></tr>
+                <tr><td>Try-on still</td><td>Nano Banana</td><td>—</td><td>2 cr</td><td>$0.10 · ₹9.50</td><td>2 cr</td></tr>
+                <tr><td>Hook cut</td><td>Seedance 2.0</td><td>11.05s</td><td>≈99 cr</td><td>$4.95 · ₹470.25</td><td>135 cr</td></tr>
+                <tr><td>Wearing cut 1</td><td>Kling 3.0 Pro</td><td>12.04s</td><td>≈24 cr</td><td>$1.20 · ₹114</td><td>135 cr</td></tr>
+                <tr><td>Wearing cut 2</td><td>Kling 3.0 Pro</td><td>14.04s</td><td>≈28 cr</td><td>$1.40 · ₹133</td><td>135 cr</td></tr>
+                <tr><td>Pose cut</td><td>Kling 3.0 Pro</td><td>8.04s</td><td>≈16 cr</td><td>$0.80 · ₹76</td><td>135 cr</td></tr>
+                <tr><td>B-roll · wearpose</td><td>Kling 3.0 Pro</td><td>10.04s</td><td>≈20 cr</td><td>$1.00 · ₹95</td><td>135 cr</td></tr>
+                <tr><td>B-roll · touch-temple</td><td>Kling 3.0 Pro</td><td>10.04s</td><td>≈20 cr</td><td>$1.00 · ₹95</td><td>135 cr</td></tr>
+                <tr><td>B-roll · catwalk</td><td>Kling 3.0 Pro</td><td>10.04s</td><td>≈20 cr</td><td>$1.00 · ₹95</td><td>135 cr</td></tr>
+                <tr><td>B-roll · hairflip</td><td>Kling 3.0 Pro</td><td>10.04s</td><td>≈20 cr</td><td>$1.00 · ₹95</td><td>135 cr</td></tr>
+              </tbody>
+              <tfoot><tr><th colspan="3">Total</th><th>≈251 cr</th><th>≈$12.55 · ₹1,192.25</th><th>1,084 cr · $54.20 · ₹5,149</th></tr></tfoot>
+            </table>
+          </div>
+          <p class="savings-note"><strong>76.8% lower credit usage.</strong> The mixed Seedance + Kling method saves approximately 833 credits, $41.65, or ₹3,956.75 per completed talking-head video versus eight Seedance generations.</p>
         </div>
       </section>
     </div>
@@ -148,7 +189,6 @@
       <div class="issues-grid">
         <div><h3>Solved</h3><ul class="check-list"><li>Prompt-to-video generation paths</li><li>Character and product selection</li><li>Clothing try-on stills + QC contacts</li><li>NSFW / IP retry handling</li><li>TH A-roll + B-roll stitch with voice pass</li><li>Per-PID self-serve audit folders</li></ul></div>
         <div><h3>Still to do</h3><ul class="question-list"><li>Production LoRA dataset + training recipe</li><li>Per-tool quality and cost thresholds</li><li>Automated model router</li><li>Retry, queue and alert strategy on Runpod</li><li>More TH scripting patterns + edge cases</li></ul></div>
-        <aside class="ask-bella"><span>✦</span><h3>Ask Bella</h3><p>Capture the bugs, unanswered decisions and edge cases from the people closest to the work.</p><button type="button" data-review-open data-review-section="Ask Bella">Open a question ↗</button><small>Your question is saved in this browser and included in the review export.</small></aside>
       </div>
     </section>
 
@@ -306,7 +346,7 @@ status = "OK" if drift_ms &lt;= 60 else "CHECK LIP-SYNC"</code></pre></div></det
     <div class="dialog-bar"><div><small>Local review workspace</small><h2>Review notes</h2></div><button type="button" data-dialog-close aria-label="Close review notes">Close</button></div>
     <form id="reviewForm">
       <label for="reviewSection">Section</label>
-      <select id="reviewSection" required><option>Overall feedback</option><option>Video outputs</option><option>Automation progress</option><option>Investment</option><option>Ask Bella</option><option>PM Tool</option><option>TH Tool</option><option>Motion work</option></select>
+      <select id="reviewSection" required><option>Overall feedback</option><option>Video outputs</option><option>Automation progress</option><option>Investment</option><option>PM Tool</option><option>TH Tool</option><option>Motion work</option></select>
       <label for="reviewNote">Note or question</label>
       <textarea id="reviewNote" rows="5" placeholder="What should change, be clarified or be added?" required></textarea>
       <button type="submit">Save note</button>

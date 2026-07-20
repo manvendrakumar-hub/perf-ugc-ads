@@ -36,6 +36,38 @@ const monthlyOut = document.querySelector('#monthlyOut');
 const creditRate = document.querySelector('#creditRate');
 const currency = document.querySelector('#currency');
 const moneyOut = document.querySelector('#moneyOut');
+const calcTabs = [...document.querySelectorAll('[data-calc-tab]')];
+const simpleCalcPanel = document.querySelector('#simpleCalcPanel');
+const advancedCalcPanel = document.querySelector('#advancedCalcPanel');
+const seedanceMix = document.querySelector('#seedanceMix');
+const klingMix = document.querySelector('#klingMix');
+const nanoMix = document.querySelector('#nanoMix');
+const seedanceMixOut = document.querySelector('#seedanceMixOut');
+const klingMixOut = document.querySelector('#klingMixOut');
+const nanoMixOut = document.querySelector('#nanoMixOut');
+const advancedCreditsOut = document.querySelector('#advancedCreditsOut');
+const advancedBreakdownOut = document.querySelector('#advancedBreakdownOut');
+const advancedMoneyOut = document.querySelector('#advancedMoneyOut');
+
+const thMixRates = {
+  seedance: 99,
+  kling: 148 / 7,
+  nano: 2,
+  usdPerCredit: 0.05,
+  inrPerUsd: 95
+};
+
+function pluralize(count, singular, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
+function activateCalculator(mode) {
+  const advanced = mode === 'advanced';
+  simpleCalcPanel.hidden = advanced;
+  advancedCalcPanel.hidden = !advanced;
+  calcTabs.forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.calcTab === mode)));
+  localStorage.setItem('ugc-cost-calculator-mode', mode);
+}
 
 function updateCalculator() {
   const count = Number(daily.value);
@@ -51,6 +83,23 @@ function updateCalculator() {
   localStorage.setItem('ugc-cost-settings', JSON.stringify({ count, rate: creditRate.value, currency: currency.value, workflow: workflow.value }));
 }
 
+function updateAdvancedCalculator() {
+  const seedanceCount = Number(seedanceMix.value);
+  const klingCount = Number(klingMix.value);
+  const nanoCount = Number(nanoMix.value);
+  const credits = (seedanceCount * thMixRates.seedance) + (klingCount * thMixRates.kling) + (nanoCount * thMixRates.nano);
+  const usd = credits * thMixRates.usdPerCredit;
+  const inr = usd * thMixRates.inrPerUsd;
+
+  seedanceMixOut.value = pluralize(seedanceCount, 'video');
+  klingMixOut.value = pluralize(klingCount, 'video');
+  nanoMixOut.value = pluralize(nanoCount, 'image');
+  advancedCreditsOut.textContent = `${credits.toLocaleString(undefined, { maximumFractionDigits: 1 })} credits`;
+  advancedBreakdownOut.textContent = `${seedanceCount} Seedance + ${klingCount} Kling + ${nanoCount} Nano Banana generations`;
+  advancedMoneyOut.textContent = `$${usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · ₹${inr.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  localStorage.setItem('ugc-th-mix-settings', JSON.stringify({ seedanceCount, klingCount, nanoCount }));
+}
+
 try {
   const saved = JSON.parse(localStorage.getItem('ugc-cost-settings'));
   if (saved) {
@@ -63,33 +112,18 @@ try {
 [daily, workflow, creditRate, currency].forEach(control => control.addEventListener('input', updateCalculator));
 updateCalculator();
 
-const connectSheet = document.querySelector('#connectSheet');
-const openSheet = document.querySelector('#openSheet');
-const sheetStatus = document.querySelector('#sheetStatus');
-const defaultCostSheetUrl = 'https://docs.google.com/spreadsheets/d/1pwKUz7le_H1XCs39XjHrisueV7JgGiotsfHTXAbiB5s/edit?gid=1676287141#gid=1676287141';
-
-function setSheetUrl(url) {
-  if (!url) return;
-  openSheet.href = url;
-  openSheet.hidden = false;
-  sheetStatus.textContent = 'Connected';
-  connectSheet.textContent = 'Change link';
-}
-setSheetUrl(localStorage.getItem('ugc-cost-sheet-url') || defaultCostSheetUrl);
-connectSheet.addEventListener('click', () => {
-  const current = localStorage.getItem('ugc-cost-sheet-url') || defaultCostSheetUrl;
-  const url = window.prompt('Paste the AI Cost Sheet URL', current);
-  if (!url) return;
-  try {
-    const parsed = new URL(url);
-    if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error();
-    localStorage.setItem('ugc-cost-sheet-url', parsed.href);
-    setSheetUrl(parsed.href);
-    showToast('AI Cost Sheet connected');
-  } catch {
-    showToast('Use a valid http or https URL');
+try {
+  const savedMix = JSON.parse(localStorage.getItem('ugc-th-mix-settings'));
+  if (savedMix) {
+    seedanceMix.value = savedMix.seedanceCount ?? 1;
+    klingMix.value = savedMix.klingCount ?? 7;
+    nanoMix.value = savedMix.nanoCount ?? 2;
   }
-});
+} catch {}
+[seedanceMix, klingMix, nanoMix].forEach(control => control.addEventListener('input', updateAdvancedCalculator));
+calcTabs.forEach(tab => tab.addEventListener('click', () => activateCalculator(tab.dataset.calcTab)));
+activateCalculator(localStorage.getItem('ugc-cost-calculator-mode') === 'advanced' ? 'advanced' : 'simple');
+updateAdvancedCalculator();
 
 const mediaLibrary = {
   pm: {
@@ -280,7 +314,7 @@ function renderNotes() {
   reviewCount.textContent = notes.length;
   notesList.replaceChildren();
   if (!notes.length) {
-    notesList.innerHTML = '<p class="empty-notes">No review notes yet. Add feedback or a question for Bella.</p>';
+    notesList.innerHTML = '<p class="empty-notes">No review notes yet.</p>';
     return;
   }
   notes.forEach(note => {
