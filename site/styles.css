@@ -86,3 +86,65 @@ dialog{width:min(1100px,calc(100vw - 34px));max-height:calc(100vh - 34px);paddin
   .cost-block-heading{grid-template-columns:1fr;gap:8px}
   .cost-table-wrap:after{content:'Swipe to compare →';display:block;position:sticky;left:0;padding:8px 10px;background:#0d0e0c;color:var(--muted);font-size:8px;text-transform:uppercase}
 }
+
+/* Sections 04–05: prevent wide table content from sizing the parent grid */
+.two-up>.section{min-width:0}
+@media(max-width:1100px){.two-up{grid-template-columns:minmax(0,1fr)}}
+
+@media(max-width:900px){
+  .needs.section,.investment.section{width:100%;min-width:0}
+  .needs .section-heading,.investment .section-heading{width:100%;min-width:0;margin-bottom:26px}
+  .needs .section-heading h2,.investment .section-heading h2{max-width:100%;font-size:clamp(28px,9vw,38px);line-height:1.02;overflow-wrap:anywhere}
+
+  .need-block{display:grid;grid-template-columns:30px minmax(0,1fr);gap:0 12px;padding:22px 0}
+  .need-icon{position:static;grid-column:1;grid-row:1/4;font-size:24px;line-height:1.2}
+  .need-block h3,.need-block ul,.need-block b{grid-column:2;min-width:0}
+  .need-block h3{font-size:18px;overflow-wrap:anywhere}
+  .need-block ul{margin:12px 0 16px;padding-left:16px;font-size:13px}
+  .need-block li{padding:4px 0}
+  .need-block b{justify-self:start}
+
+  .ledger,.sheet-pending,.calculator-shell,.calculator-panel,.calculator,.advanced-mix,.th-cost-block{width:100%;min-width:0;max-width:100%}
+  .ledger div{min-width:0;padding:15px 16px}
+  .ledger strong{font-size:24px}
+  .sheet-pending{padding:15px;margin:20px 0;overflow-wrap:anywhere}
+  .sheet-pending p{line-height:1.55}
+  .calculator{gap:20px;padding-top:18px}
+  .calculator>div,.rate-field,.calc-result{min-width:0;max-width:100%}
+  .calculator select,.calculator input{max-width:100%}
+  .rate-field{display:grid;grid-template-columns:64px minmax(0,1fr)}
+  .rate-field select,.rate-field input{width:100%;min-width:0}
+  .calc-result{overflow-wrap:anywhere}
+  .calc-result strong{font-size:clamp(23px,8vw,30px);line-height:1.15}
+  .calc-result b,.calc-result small{line-height:1.5}
+  .advanced-intro{margin:18px 0;font-size:12px;line-height:1.55}
+  .model-slider{width:100%;min-width:0;padding:15px}
+  .model-slider span{min-width:0}.model-slider small{white-space:normal;overflow-wrap:anywhere}
+
+  .th-cost-block{margin-top:34px;padding-top:24px}
+  .cost-table-wrap{width:100%;max-width:100%;overflow:visible;border:0}
+  .cost-table-wrap:after{content:none;display:none}
+  .cost-table{display:block;width:100%;min-width:0;font-size:11px}
+  .cost-table thead{display:none}
+  .cost-table tbody{display:grid;gap:10px}
+  .cost-table tbody tr{display:block;border:1px solid var(--line);background:#0b0c0a;padding:12px 14px}
+  .cost-table tbody td{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;width:100%;padding:7px 0;border-right:0;border-bottom:1px solid #24261f;white-space:normal;text-align:right;overflow-wrap:anywhere}
+  .cost-table tbody td:last-child{border-bottom:0}
+  .cost-table tbody td:before{flex:0 0 42%;color:var(--muted);font-size:9px;text-align:left;text-transform:uppercase;letter-spacing:.04em}
+  .cost-table tbody td:first-child{display:block;padding:0 0 10px;margin-bottom:3px;color:var(--paper);font-size:13px;font-weight:800;text-align:left}
+  .cost-table tbody td:first-child:before{content:none}
+  .cost-table tbody td:nth-child(2):before{content:'Model used'}
+  .cost-table tbody td:nth-child(3):before{content:'Duration'}
+  .cost-table tbody td:nth-child(4):before{content:'Current method'}
+  .cost-table tbody td:nth-child(5):before{content:'Cost at $0.05 / cr'}
+  .cost-table tbody td:nth-child(6):before{content:'All-Seedance'}
+  .cost-table tfoot{display:block;margin-top:12px;border:1px solid var(--acid)}
+  .cost-table tfoot tr{display:block}
+  .cost-table tfoot th{display:flex;justify-content:space-between;gap:16px;width:100%;padding:10px 12px;border-right:0;border-bottom:1px solid var(--line);white-space:normal;text-align:right}
+  .cost-table tfoot th:first-child{display:block;color:var(--acid);font-size:12px;text-align:left;text-transform:uppercase}
+  .cost-table tfoot th:nth-child(2):before{content:'Current method';color:var(--muted);font-size:9px;text-transform:uppercase}
+  .cost-table tfoot th:nth-child(3):before{content:'Cost';color:var(--muted);font-size:9px;text-transform:uppercase}
+  .cost-table tfoot th:nth-child(4):before{content:'All-Seedance';color:var(--muted);font-size:9px;text-transform:uppercase}
+  .cost-table tfoot th:last-child{border-bottom:0}
+  .savings-note{margin-top:12px;padding:13px;font-size:11px;overflow-wrap:anywhere}
+}
