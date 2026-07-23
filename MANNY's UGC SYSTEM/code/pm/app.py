@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Local self-serve web app for the product-modelling pipeline. Zero Claude tokens.
 
-Form: PID · Character (dropdown) · Type · #videos -> runs modelling.run_modelling in a
+Form: Video provider · PID · Character (dropdown) · Type · #videos -> runs
+modelling.run_modelling in a
 background thread -> results page shows the try-on still + each video with its QC contact
 sheet for your final review.
 
@@ -36,6 +37,13 @@ button{margin-top:24px;padding:12px 20px;background:#1a1a2e;color:#fff;border:0;
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}</style></head><body>
 <h1>🎬 UGC Product-Modelling Studio</h1>
 <form method="post" action="{{ url_for('run') }}">
+  <label>Video generation provider</label>
+  <select name="provider" id="provider" onchange="syncProvider()">
+    <option value="higgsfield" selected>Use Higgsfield</option>
+    <option value="fal">Use fal.ai</option>
+  </select>
+  <div class="hint" id="provider-hint">Higgsfield uses the authenticated local CLI. Seedance, Kling, and Remix are available.</div>
+
   <label>Type</label>
   <select name="kind" id="kind" onchange="syncKind()">{% for k,lbl in types %}<option value="{{k}}">{{lbl}}</option>{% endfor %}</select>
 
@@ -48,7 +56,7 @@ button{margin-top:24px;padding:12px 20px;background:#1a1a2e;color:#fff;border:0;
     <label>Variation <span style="color:#777;font-weight:400;font-size:13px">— location, depends on Sub Type</span></label>
     <select name="variation" id="variation"></select>
     <label>Video model</label>
-    <select name="model">{% for m,lbl in models %}<option value="{{m}}">{{lbl}}</option>{% endfor %}</select>
+    <select name="model" id="model">{% for m,lbl in models %}<option value="{{m}}">{{lbl}}</option>{% endfor %}</select>
     <div class="hint">Seedance = 12-shot rich editorial (true multishot, natural skin) · Kling 3.0 = 10-shot numbered editorial with camera + model movement. Each take rotates a distinct prompt variant — 2–3 takes give you intentionally different raw material to cut from.</div>
     <label>Number of videos <span style="color:#777;font-weight:400;font-size:13px">— takes of the SAME model · PID · variation</span></label>
     <select name="n"><option>1</option><option selected>2</option><option>3</option></select>
@@ -93,7 +101,23 @@ function syncKind(){
   document.getElementById('pid').required = !isRemix;
   document.getElementById('remix_pids').required = isRemix;
 }
-syncVar(); syncKind();
+function syncProvider(){
+  const isFal=document.getElementById('provider').value==='fal';
+  const kind=document.getElementById('kind'), model=document.getElementById('model');
+  const remix=[...kind.options].find(o=>o.value==='remix');
+  const kling=[...model.options].find(o=>o.value==='kling3_0');
+  const seedance=[...model.options].find(o=>o.value==='seedance_2_0');
+  if(remix) remix.disabled=isFal;
+  if(kling) kling.disabled=false;
+  if(seedance) seedance.disabled=isFal;
+  if(isFal && kind.value==='remix') kind.value='product_modelling';
+  if(isFal) model.value='kling3_0';
+  document.getElementById('provider-hint').textContent=isFal
+    ? 'fal.ai uses Nano Banana 2 for the try-on still and Kling 3.0 for video. Seedance is disabled because ByteDance rejects PM face-forward inputs.'
+    : 'Higgsfield uses the authenticated local CLI. Seedance, Kling, and Remix are available.';
+  syncKind();
+}
+syncVar(); syncProvider();
 </script>
 </body></html>"""
 
@@ -111,7 +135,7 @@ a{color:#1a1a2e}</style></head><body>
 {% if job.kind == 'remix' %}
 <h1>Remix · {{job.char}} · <small style="font-weight:400;color:#666">{{job.pids}}</small> <span class="s {{status}}">{{status}}</span></h1>
 {% else %}
-<h1>PID {{job.pid}} · {{job.char}} · <small style="font-weight:400;color:#666">{{job.subtype}}/{{job.variation}} · {{job.model}}</small> <span class="s {{status}}">{{status}}</span></h1>
+<h1>PID {{job.pid}} · {{job.char}} · <small style="font-weight:400;color:#666">{{job.subtype}}/{{job.variation}} · {{job.model}} via {{job.provider}}</small> <span class="s {{status}}">{{status}}</span></h1>
 {% endif %}
 <pre>{{ '\n'.join(job.log) }}</pre>
 {% if job.log_path %}<p style="font-size:13px;color:#777">Log file: <code>{{job.log_path}}</code></p>{% endif %}
@@ -180,7 +204,7 @@ def _worker(jid, kind, params):
         else:
             j["result"] = modelling.run_modelling(
                 params["pid"], params["char"], params["n"], kind, params["model"],
-                params["subtype"], params["variation"], log=_log)
+                params["subtype"], params["variation"], provider=params["provider"], log=_log)
         j["status"] = "done"
     except Exception as e:
         j["status"] = "error"
@@ -200,6 +224,11 @@ def index():
 @app.route("/run", methods=["POST"])
 def run():
     kind = request.form.get("kind", "product_modelling")
+    provider = request.form.get("provider", "higgsfield")
+    if provider not in modelling.VIDEO_PROVIDERS:
+        abort(400, "Unknown video provider")
+    if provider == "fal" and kind != "product_modelling":
+        abort(400, "fal.ai currently supports Product Modelling only")
     char = request.form["char"]
     jid = uuid.uuid4().hex
 
@@ -217,12 +246,15 @@ def run():
         pid = request.form["pid"].strip()
         n = int(request.form.get("n", 2))
         model = request.form.get("model", "seedance_2_0")
+        if provider == "fal" and model not in modelling.FAL_PM_VIDEO_MODELS:
+            abort(400, "fal.ai Seedance rejects PM face-forward inputs; select Kling 3.0")
         subtype = request.form.get("subtype", "A3.1")
         variation = request.form.get("variation") or None
-        params = {"pid": pid, "char": char, "n": n, "model": model,
+        params = {"pid": pid, "char": char, "n": n, "model": model, "provider": provider,
                   "subtype": subtype, "variation": variation}
         JOBS[jid] = {"status": "running", "log": [], "result": None, "kind": kind,
-                     "pid": pid, "char": char, "model": model, "subtype": subtype,
+                     "pid": pid, "char": char, "model": model, "provider": provider,
+                     "subtype": subtype,
                      "variation": variation, "log_path": None}
 
     threading.Thread(target=_worker, args=(jid, kind, params), daemon=True).start()

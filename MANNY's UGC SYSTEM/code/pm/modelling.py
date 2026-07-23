@@ -4,9 +4,10 @@
 Given PID + character + N: product images from `Stock PID Images/<PID>/` + the
 character anchor from the Character Library ->
   1) gpt_image_2 try-on still (anchor + product)  -> QC image fit-gate
-  2) seedance_2_0 x N (start_image=still + product ref) -> QC video each
+  2) seedance_2_0 x N through Higgsfield or fal.ai (start_image=still) -> QC video each
 Outputs land in `Ads/<PID>/_selfserve/`. All generation shells out to the
-Higgsfield CLI (device-login). Importable: call run_modelling(...).
+Higgsfield uses the local CLI (device-login); fal.ai uses `.secrets/fal.env`.
+Importable: call run_modelling(...).
 """
 import json
 import os
@@ -49,6 +50,13 @@ IMG_EXT = (".png", ".jpg", ".jpeg", ".webp")
 
 # Max auto-retries per take on nsfw/ip_detected (uncharged — retry freely)
 NSFW_RETRIES = 3
+VIDEO_PROVIDERS = ("higgsfield", "fal")
+FAL_PM_VIDEO_MODELS = ("kling3_0",)
+FAL_IMAGE_ENDPOINT = "fal-ai/nano-banana-2/edit"
+FAL_VIDEO_ENDPOINTS = {
+    "seedance_2_0": "bytedance/seedance-2.0/image-to-video",
+    "kling3_0": "fal-ai/kling-video/v3/pro/image-to-video",
+}
 
 
 # ----------------------------------------------------------------- registries
@@ -139,6 +147,185 @@ def _download(url, dest):
     return dest
 
 
+def _load_fal_credentials():
+    """Load the gitignored server-side fal.ai key without ever sending it to the browser."""
+    if os.environ.get("FAL_KEY"):
+        return
+    env_path = ROOT / ".secrets" / "fal.env"
+    if env_path.exists():
+        for raw in env_path.read_text().splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            if key.strip() == "FAL_KEY":
+                os.environ["FAL_KEY"] = value.strip().strip("\"'")
+                break
+    if not os.environ.get("FAL_KEY"):
+        raise RuntimeError("fal.ai is selected but FAL_KEY is missing from .secrets/fal.env")
+
+
+def _fal_error_summary(error):
+    """Reduce fal validation payloads to a useful message without logging the full prompt."""
+    headers = getattr(error, "response_headers", None) or {}
+    request_id = headers.get("x-fal-request-id")
+    billable = headers.get("x-fal-billable-units")
+    retryable = headers.get("x-fal-needs-retry")
+    context = "".join(
+        f" | {label}: {value}" for label, value in (
+            ("request", request_id), ("billable units", billable), ("retryable", retryable)
+        ) if value is not None
+    )
+    payload = error.args[0] if isinstance(error, BaseException) and error.args else error
+    if isinstance(payload, list) and payload and isinstance(payload[0], dict):
+        item = payload[0]
+        kind = item.get("type", "request_failed")
+        message = item.get("msg", str(error))
+        reason = (((item.get("ctx") or {}).get("extra_info") or {}).get("reason"))
+        if kind == "content_policy_violation":
+            return ("fal.ai content_policy_violation: the input may contain a real-person likeness "
+                    f"({reason or 'partner validation'}). Use fal.ai Kling or Higgsfield.{context}")
+        return f"fal.ai {kind}: {message}" + (f" ({reason})" if reason else "") + context
+    return f"fal.ai request failed: {str(error)[:300]}{context}"
+
+
+def _fal_generate_image(prompt, images, out_path, log=print):
+    """Create the PM try-on still through fal.ai Nano Banana 2 Edit."""
+    _load_fal_credentials()
+    import fal_client
+
+    try:
+        log("  fal.ai Nano Banana 2: uploading character + product references")
+        image_urls = [fal_client.upload_file(str(path)) for path in images]
+        log("  fal.ai Nano Banana 2: generating try-on still")
+        result = fal_client.subscribe(
+            FAL_IMAGE_ENDPOINT,
+            arguments={
+                "prompt": prompt,
+                "image_urls": image_urls,
+                "num_images": 1,
+                "aspect_ratio": "9:16",
+                "output_format": "jpeg",
+                "resolution": "2K",
+                "limit_generations": True,
+            },
+            with_logs=False,
+            client_timeout=600,
+        )
+    except Exception as exc:
+        raise RuntimeError(_fal_error_summary(exc)) from exc
+    outputs = result.get("images") if isinstance(result, dict) else None
+    url = outputs[0].get("url") if outputs and isinstance(outputs[0], dict) else None
+    if not url:
+        raise RuntimeError("fal.ai Nano Banana 2 completed without an image URL")
+    log("  fal.ai Nano Banana 2 try-on still DONE")
+    return _download(url, out_path)
+
+
+def _validate_fal_video_input(model, arguments, image_path):
+    """Fail locally before spend when fal's documented media/schema limits are violated."""
+    from PIL import Image
+
+    path = Path(image_path)
+    max_bytes = 30_000_000 if model == "seedance_2_0" else 50_000_000
+    if not path.is_file() or path.stat().st_size > max_bytes:
+        raise ValueError(f"fal.ai start image missing or over {max_bytes // 1_000_000} MB: {path}")
+    with Image.open(path) as image:
+        width, height = image.size
+    if min(width, height) < 300 or not 0.4 <= width / height <= 2.5:
+        raise ValueError(f"fal.ai start image has unsupported dimensions: {width}x{height}")
+    if not arguments.get("prompt"):
+        raise ValueError("fal.ai video prompt is empty")
+    duration = int(arguments["duration"])
+    if model == "seedance_2_0" and duration not in range(4, 16):
+        raise ValueError("fal.ai Seedance duration must be 4-15 seconds")
+    if model == "kling3_0" and duration not in range(3, 16):
+        raise ValueError("fal.ai Kling duration must be 3-15 seconds")
+
+
+def _fal_submit_video(model, params, medias, log=print):
+    """Submit one Seedance or Kling image-to-video job to fal.ai."""
+    if len(medias) != 1:
+        raise ValueError("fal.ai image-to-video requires exactly one start image")
+    _flag, image_path = medias[0]
+    _load_fal_credentials()
+    try:
+        import fal_client
+    except ImportError as exc:
+        raise RuntimeError("fal-client is not installed; run: pip install -r requirements.txt") from exc
+
+    image_url = fal_client.upload_file(str(image_path))
+    if model == "seedance_2_0":
+        arguments = {
+            "prompt": params["prompt"],
+            "image_url": image_url,
+            "resolution": params.get("resolution", "1080p"),
+            "duration": str(params.get("duration", 15)),
+            "aspect_ratio": params.get("aspect_ratio", "9:16"),
+            "generate_audio": str(params.get("generate_audio", "false")).lower() == "true",
+            "bitrate_mode": params.get("bitrate_mode", "high"),
+        }
+    elif model == "kling3_0":
+        arguments = {
+            "prompt": params["prompt"],
+            "start_image_url": image_url,
+            "duration": str(params.get("duration", 15)),
+            "generate_audio": str(params.get("sound", "off")).lower() == "on",
+            # fal currently normalizes an omitted value to 16:9 even for a vertical start image;
+            # Kling's downstream partner then rejects the conflicting input with a generic 422.
+            "aspect_ratio": params.get("aspect_ratio", "9:16"),
+            "negative_prompt": "blur, distorted face, plastic skin, morphing eyewear, extra fingers, text",
+            "cfg_scale": 0.5,
+        }
+    else:
+        raise ValueError(f"fal.ai has no endpoint configured for {model}")
+    _validate_fal_video_input(model, arguments, image_path)
+    try:
+        handle = fal_client.submit(FAL_VIDEO_ENDPOINTS[model], arguments=arguments)
+    except Exception as exc:
+        raise RuntimeError(_fal_error_summary(exc)) from exc
+    log(f"  fal.ai request submitted -> {handle.request_id}")
+    return handle.request_id
+
+
+def _fal_wait_video(model, request_id, timeout=1800, interval=15):
+    """Poll a fal.ai queue request and return its output video URL."""
+    _load_fal_credentials()
+    import fal_client
+
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            status = fal_client.status(FAL_VIDEO_ENDPOINTS[model], request_id, with_logs=False)
+        except Exception as exc:
+            raise RuntimeError(_fal_error_summary(exc)) from exc
+        if isinstance(status, fal_client.Completed):
+            if status.error:
+                raise RuntimeError(_fal_error_summary(status.error))
+            try:
+                result = fal_client.result(FAL_VIDEO_ENDPOINTS[model], request_id)
+            except Exception as exc:
+                raise RuntimeError(_fal_error_summary(exc)) from exc
+            url = (result.get("video") or {}).get("url") if isinstance(result, dict) else None
+            if not url:
+                raise RuntimeError(f"fal.ai job {request_id} completed without a video URL")
+            return url
+        time.sleep(interval)
+    raise TimeoutError(f"fal.ai job {request_id} timed out")
+
+
+def _submit_video(provider, model, params, medias, log=print):
+    if provider == "fal":
+        return _fal_submit_video(model, params, medias, log=log)
+    return _submit(model, params, medias)
+
+
+def _wait_video(provider, model, job_id, timeout=1800):
+    if provider == "fal":
+        return _fal_wait_video(model, job_id, timeout=timeout)
+    return _wait(job_id, timeout=timeout)
+
+
 def _qc(kind, target, references):
     """Run qc_check.py against ONE OR MORE PID reference images (product-match gate);
     return (contact_sheet_path | None, raw_json | None)."""
@@ -160,7 +347,7 @@ def _split_products(prods):
     return box, glasses
 
 
-def _tryon_still(anchor, product_front, preamble, out_path, log=print):
+def _tryon_still(anchor, product_front, preamble, out_path, provider="higgsfield", log=print):
     """Generate a try-on still (gpt_image_2): character wearing the product.
     Returns local path or None on failure. Two attempts before giving up."""
     prompt = (
@@ -173,6 +360,12 @@ def _tryon_still(anchor, product_front, preamble, out_path, log=print):
     )
     params = {"prompt": prompt, "aspect_ratio": "9:16", "quality": "high", "resolution": "2k"}
     medias = [("image", anchor), ("image", product_front)]
+    if provider == "fal":
+        try:
+            return _fal_generate_image(prompt, [anchor, product_front], out_path, log=log)
+        except Exception as exc:
+            log(f"  fal.ai try-on still failed: {exc}")
+            return None
     for attempt in range(1, 3):
         try:
             jid = _submit("gpt_image_2", params, medias)
@@ -827,17 +1020,25 @@ def run_remix(pids, char_id, top_style=None, top_color=None, bottom_style=None,
 
 # ----------------------------------------------------------------- orchestration
 def run_modelling(pid, char_id, n_videos=2, kind="product_modelling",
-                  model="seedance_2_0", subtype="A3.1", variation=None, log=print):
+                  model="seedance_2_0", subtype="A3.1", variation=None,
+                  provider="higgsfield", log=print):
     """kind: 'product_modelling' (A.3 — sub type × variation × selected model) or
     'unbox_modelling_indoor' (U2, CLI-only; not exposed in the PM tool).
     model: 'seedance_2_0' (10–12 rich) or 'kling3_0' (18–20 cuts) — ignored for U2.
     subtype/variation: A.3 location selectors; N videos = N takes of the SAME selection."""
     pid = str(pid).strip()
+    if provider not in VIDEO_PROVIDERS:
+        raise ValueError(f"Unknown video provider: {provider}")
+    if provider == "fal" and kind != "product_modelling":
+        raise ValueError("fal.ai currently supports Product Modelling only")
+    if provider == "fal" and model not in FAL_PM_VIDEO_MODELS:
+        raise ValueError("fal.ai Seedance rejects PM face-forward inputs; select Kling 3.0")
     if model not in MODELS:
         model = "seedance_2_0"
     out = ROOT / "Ads" / pid / "_selfserve"
     out.mkdir(parents=True, exist_ok=True)
     res = {"pid": pid, "character": char_id, "kind": kind, "model": model,
+           "provider": provider,
            "subtype": subtype, "variation": variation,
            "still": None, "still_sheet": None, "videos": [], "errors": []}
 
@@ -876,20 +1077,23 @@ def run_modelling(pid, char_id, n_videos=2, kind="product_modelling",
         # N videos are intentionally diverse rather than random stochastic repeats.
         specs = [(i, label, preamble + _shots_for(model, i - 1)) for i in range(1, n + 1)]
         dens = "18–20 cut" if model == "kling3_0" else "10–12 moment"
-        log(f"product: {prods[0].name} | {char_id} | {model} | {subtype}/{variation} | "
+        log(f"product: {prods[0].name} | {char_id} | {model} via {provider} | {subtype}/{variation} | "
             f"{n} take(s) × {dens} multishot (same model · PID · variation)")
 
         # IMAGE-FIRST: try-on still locks the product onto the character before video spend.
         # Kling cannot accept kling_element_ids via CLI → still-as-start-image is the fix.
         # Seedance: still + product refs gives both identity lock and product fidelity.
         still = _tryon_still(anchor, prods[0], preamble,
-                             out / "_stills" / f"still_{label}.jpg", log=log)
+                             out / "_stills" / f"still_{label}.jpg", provider=provider, log=log)
         if still:
             res["still"] = str(still)
             vsheet_s, _ = _qc("image", still, prods[:2])
             res["still_sheet"] = vsheet_s
             log(f"try-on still DONE | QC: {Path(vsheet_s).name if vsheet_s else 'none'}")
         else:
+            if provider == "fal":
+                log("try-on still FAILED — stopping fal.ai run before video spend")
+                raise RuntimeError("fal.ai try-on still failed — stopped before paid video generation")
             log("try-on still FAILED — falling back to raw anchor")
 
         if still and model == "kling3_0":
@@ -917,25 +1121,27 @@ def run_modelling(pid, char_id, n_videos=2, kind="product_modelling",
         jid = None
         for attempt in range(1, NSFW_RETRIES + 2):
             try:
-                jid = _submit(model, params, medias)
+                jid = _submit_video(provider, model, params, medias, log=log)
                 log(f"  take {idx} [{label}] attempt {attempt} -> {jid}")
                 break
             except RuntimeError as e:
                 log(f"  take {idx} [{label}] submit error: {e}")
-                if attempt > NSFW_RETRIES:
+                # fal reports retryability explicitly and paid submissions must never be
+                # duplicated blindly. Higgsfield's filtered retries are handled while polling.
+                if provider == "fal" or attempt > NSFW_RETRIES:
                     res["errors"].append(f"take {idx} [{label}]: submit failed after {attempt} attempts")
                     jid = None
                     break
         if jid:
-            jobs.append((idx, label, jid))
+            jobs.append((idx, label, jid, params))
         time.sleep(1)
 
-    for idx, label, jid in jobs:
+    for idx, label, jid, params in jobs:
         try:
             url = None
             for attempt in range(1, NSFW_RETRIES + 2):
                 try:
-                    url = _wait(jid, timeout=1800)
+                    url = _wait_video(provider, model, jid, timeout=1800)
                     break
                 except RuntimeError as e:
                     err = str(e)
@@ -944,8 +1150,7 @@ def run_modelling(pid, char_id, n_videos=2, kind="product_modelling",
                         log(f"  take {idx} [{label}] {filter_type} (uncharged) — retrying {attempt}/{NSFW_RETRIES}")
                         if attempt <= NSFW_RETRIES:
                             # Resubmit the same take
-                            prompt = _prompt_gate(_shots_for(model, idx - 1), model, log=log)
-                            jid = _submit(model, _submit_params(model, prompt), medias)
+                            jid = _submit_video(provider, model, params, medias, log=log)
                             log(f"  take {idx} [{label}] retry job -> {jid}")
                             continue
                     raise

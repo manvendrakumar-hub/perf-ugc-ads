@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "site/**"
+      - "MANNY's UGC SYSTEM/**"
       - ".github/workflows/deploy-ugc-site.yml"
   workflow_dispatch:
 
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: site
+        working-directory: "MANNY's UGC SYSTEM"
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

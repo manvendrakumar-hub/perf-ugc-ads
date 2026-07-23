@@ -25,10 +25,11 @@
       <a href="#investment"><i>05</i>R&amp;D investment</a>
       <a href="#local"><i>06</i>Why go local?</a>
       <a href="#issues"><i>07</i>Issues &amp; open questions</a>
-      <a href="#pm-deep"><i>08</i>PM orchestration</a>
-      <a href="#th-deep"><i>09</i>TH orchestration</a>
-      <a href="#motion"><i>10</i>Motion work</a>
-      <a href="#thoughts"><i>11</i>Your thoughts?</a>
+      <a href="#pm-run"><i>08</i>Actual PM run trace</a>
+      <a href="#pm-deep"><i>09</i>PM orchestration</a>
+      <a href="#th-deep"><i>10</i>TH orchestration</a>
+      <a href="#motion"><i>11</i>Motion work</a>
+      <a href="#thoughts"><i>12</i>Your thoughts?</a>
     </nav>
     <p class="sidebar-foot">Build log · July 2026<br>Active R&amp;D, honest status.</p>
   </aside>
@@ -72,7 +73,7 @@
               <source src="assets/web-videos/th/01.mp4" type="video/mp4">
             </video>
           </div>
-          <div class="video-copy"><p>Script, character, product, talking cuts, B-roll, stitching and one consistent voice—one gated run.</p><code>site/assets/videos/th-downloads/</code><div class="video-actions"><button type="button" data-library="th">Browse TH outputs</button><button type="button" data-copy="site/assets/videos/th-downloads/">Copy folder path</button></div></div>
+          <div class="video-copy"><p>Script, character, product, talking cuts, B-roll, stitching and one consistent voice—one gated run.</p><code>MANNY's UGC SYSTEM/assets/videos/th-downloads/</code><div class="video-actions"><button type="button" data-library="th">Browse TH outputs</button><button type="button" data-copy="MANNY's UGC SYSTEM/assets/videos/th-downloads/">Copy folder path</button></div></div>
         </article>
       </div>
     </section>
@@ -192,8 +193,200 @@
       </div>
     </section>
 
-    <section class="deep section" id="pm-deep" data-section="08">
+    <section class="run-trace section" id="pm-run" data-section="08">
       <div class="section-number">08</div>
+      <header class="run-trace-head">
+        <div>
+          <p class="eyebrow">Actual execution · PID 245787 · E31_porto</p>
+          <h2>The whole PM run.<br><span>No black boxes.</span></h2>
+        </div>
+        <div class="run-verdict" aria-label="Run verdict">
+          <small>Final verdict</small>
+          <strong>Creative rejected</strong>
+          <p>The API completed and returned a valid file. The creative output is not approved.</p>
+        </div>
+      </header>
+
+      <div class="run-facts" aria-label="Run facts">
+        <div><small>Tool / type</small><strong>PM · Product Modelling</strong></div>
+        <div><small>Scene</small><strong>A3.1 · Office</strong></div>
+        <div><small>Provider</small><strong>fal.ai</strong></div>
+        <div><small>Video route</small><strong>Kling 3.0 Pro</strong></div>
+        <div><small>Requested</small><strong>1 × 15 sec take</strong></div>
+        <div><small>Page rebuild spend</small><strong>0 credits</strong></div>
+      </div>
+
+      <div class="execution-rail">
+        <article class="run-step">
+          <div class="step-marker"><span>01</span><small>Input selection</small></div>
+          <div class="step-copy">
+            <p class="step-kicker">UI choices → local file resolution</p>
+            <h3>Pick the character and product.</h3>
+            <p>The run selected <code>E31_porto</code> from the female European character library and PID <code>245787</code> from the stock product library. The tool resolves both IDs to fixed local source files before any model call.</p>
+            <dl class="path-list">
+              <dt>Character</dt><dd>Character Library/Female European/E31_porto/E31_porto_anchor.png</dd>
+              <dt>Product</dt><dd>Stock PID Images/245787/DSC_2962.jpg</dd>
+            </dl>
+          </div>
+          <div class="step-media input-pair">
+            <figure><img src="assets/run-trace/pm-fal-245787-e31/01-character-e31.jpg" alt="Selected E31_porto character anchor"><figcaption><b>Character · E31_porto</b><span>Identity anchor</span></figcaption></figure>
+            <figure><img src="assets/run-trace/pm-fal-245787-e31/02-pid-245787.jpg" alt="Selected PID 245787 black rectangular sunglasses"><figcaption><b>PID · 245787</b><span>Black rectangular sunglasses</span></figcaption></figure>
+          </div>
+        </article>
+
+        <article class="run-step">
+          <div class="step-marker"><span>02</span><small>Creative setup</small></div>
+          <div class="step-copy">
+            <p class="step-kicker">Form state → scene grammar</p>
+            <h3>Pick type, subtype and variation.</h3>
+            <p><strong>Product Modelling</strong> chooses the one-product pipeline. <strong>A3.1</strong> chooses the indoor modelling grammar. <strong>Office</strong> injects the environment preamble used by both the try-on and video prompt.</p>
+            <div class="selection-chips" aria-label="Selected form values"><span>Type · Product Modelling</span><span>Subtype · A3.1</span><span>Variation · Office</span><span>Takes · 1</span></div>
+          </div>
+          <div class="step-evidence">
+            <small>Injected scene preamble</small>
+            <blockquote>Cinematic product-modelling fashion video, vertical 9:16, 15 seconds, inside a modern open-plan office with clean desk surfaces, soft diffused overhead light, floor-to-ceiling windows with a city view beyond, polished professional atmosphere.</blockquote>
+          </div>
+        </article>
+
+        <article class="run-step">
+          <div class="step-marker"><span>03</span><small>Model routing</small></div>
+          <div class="step-copy">
+            <p class="step-kicker">Provider choice → endpoint contract</p>
+            <h3>Route stills and video to different models.</h3>
+            <p>fal.ai was selected as the provider. Nano Banana 2 generated the composite try-on still; Kling 3.0 Pro received that still as its start frame. Seedance was not used here because the fal/ByteDance policy path rejected the face-forward PM inputs tested during diagnosis.</p>
+          </div>
+          <div class="route-map" aria-label="Model routing">
+            <div><small>Still compositor</small><strong>fal-ai/nano-banana-2/edit</strong></div>
+            <b>→</b>
+            <div><small>Video generator</small><strong>fal-ai/kling-video/v3/pro/image-to-video</strong></div>
+          </div>
+        </article>
+
+        <article class="run-step">
+          <div class="step-marker"><span>04</span><small>Try-on pass</small></div>
+          <div class="step-copy">
+            <p class="step-kicker">Character + product + fit instruction</p>
+            <h3>Generate the product-wearing start frame.</h3>
+            <p>The first still returned a face-to-frame fit ratio of <strong>1.17</strong> against an advisory maximum of <strong>1.05</strong>, so the run tried again with a stricter physical-fit prompt.</p>
+            <details class="trace-detail">
+              <summary>Read the exact try-on prompt</summary>
+              <p>Cinematic product-modelling fashion video, vertical 9:16, 15 seconds, inside a modern open-plan office with clean desk surfaces, soft diffused overhead light, floor-to-ceiling windows with a city view beyond, polished professional atmosphere. Medium front three-quarter portrait of the same character wearing the exact black sunglasses from the product reference. CRITICAL PHYSICAL FIT: render the frame at realistic optical scale, only 88 to 95 percent of her face width; both outer hinges must sit at her temples and must not extend beyond the sides of her face. The bridge rests naturally on her nose and the temples travel straight toward her ears. Keep the exact rectangular frame shape, black colour, silver hinge hardware and tinted lenses identical to the product reference. Keep her exact identity, skin tone, hair and taupe waistcoat outfit. Natural skin texture and visible pores, candid office photograph, no text, no invented accessories.</p>
+            </details>
+          </div>
+          <div class="step-media tryon-pair">
+            <figure><img src="assets/run-trace/pm-fal-245787-e31/03-tryon-pass-1.jpg" alt="First generated try-on pass"><figcaption><b>Pass 1 · Retry</b><span>Fit ratio 1.17 · above 1.05 advisory</span></figcaption></figure>
+            <figure><img src="assets/run-trace/pm-fal-245787-e31/04-tryon-pass-2.jpg" alt="Second stricter generated try-on pass"><figcaption><b>Pass 2 · Manual override</b><span>Fit ratio 1.31 · risk accepted for compatibility test</span></figcaption></figure>
+          </div>
+          <aside class="decision-warning">
+            <strong>Gate did not cleanly pass.</strong>
+            <p>Pass two scored worse numerically. Because the ratio is advisory and the product is a wide sunglass style, it was manually accepted to continue the provider test. That override is a creative-quality risk—not a solved fit result.</p>
+          </aside>
+        </article>
+
+        <article class="run-step">
+          <div class="step-marker"><span>05</span><small>Prompt injection</small></div>
+          <div class="step-copy">
+            <p class="step-kicker">Four layers → one submitted prompt</p>
+            <h3>Assemble the final motion prompt.</h3>
+            <p>The code does not submit a vague “make a video” instruction. It concatenates the selected scene, identity continuity, product lock, a numbered motion sequence, realism constraints and exclusions into one provider-safe prompt.</p>
+          </div>
+          <div class="prompt-stack" aria-label="Prompt layers">
+            <div><i>01</i><span><b>Scene</b>Office location, 9:16 frame, 15-second duration.</span></div>
+            <div><i>02</i><span><b>Identity lock</b>Same outfit, hair, accessories, skin tone.</span></div>
+            <div><i>03</i><span><b>Product lock</b>Same frame shape, colour, rim and lenses; no morphing.</span></div>
+            <div><i>04</i><span><b>Motion plan</b>10 editorial moments: front, turn, close-up, adjust, profile, pivot, wide, hair toss, lens close-up, final step.</span></div>
+            <div><i>05</i><span><b>Realism + exclusions</b>Natural skin texture; no text or captions.</span></div>
+          </div>
+          <details class="trace-detail full-prompt">
+            <summary>Read the exact 1,608-character video prompt</summary>
+            <p>Cinematic product-modelling fashion video, vertical 9:16, 15 seconds, inside a modern open-plan office with clean desk surfaces, soft diffused overhead light, floor-to-ceiling windows with a city view beyond, polished professional atmosphere. She wears EXACTLY the same outfit, hair and accessories shown in the start-image — do NOT change clothing, hair colour, jewellery or skin tone. She wears the exact eyewear from the product reference — keep the frame shape, colour, rim and lenses IDENTICAL in every shot; never morph, warp, recolour, or add/remove parts. 10 distinct editorial shot moments: [1] medium front, she stands tall, chin level, direct gaze to camera, shoulders rolled back; [2] she slowly rotates 30 degrees right, chin raised, shoulders drawing back with the turn; [3] camera moves closer — frame rim and lenses in sharp focus, soft bokeh behind her; [4] she raises one hand and adjusts the frame on her nose bridge, precise and deliberate; [5] full right profile — clean frame silhouette crisp, she holds an elegant composed pose; [6] she pivots back through 3/4 to face camera, hair catching the light as it settles; [7] camera pulls slightly wider — she shifts her weight to one hip, hand resting at her side; [8] she tosses her hair off one shoulder with a fluid sweep, snaps eyes back to camera; [9] camera drifts forward — lenses catching the warm raking light, bridge sharp; [10] final medium front — she steps forward slightly, shoulders square, full confident gaze. Real natural skin texture with visible pores, NOT airbrushed; soft natural light. No on-screen text, no captions.</p>
+          </details>
+          <aside class="decision-warning violet-warning">
+            <strong>Prompt-density problem.</strong>
+            <p>Ten moments inside 15 seconds allows roughly 1.5 seconds per beat. That is probably too much motion and shot logic for one image-to-video generation, and is a likely reason the output feels bad.</p>
+          </aside>
+        </article>
+
+        <article class="run-step">
+          <div class="step-marker"><span>06</span><small>API submit</small></div>
+          <div class="step-copy">
+            <p class="step-kicker">Adapter → fal queue</p>
+            <h3>Convert tool settings into the fal payload.</h3>
+            <p>The compatibility fix was explicit vertical <code>9:16</code> plus one assembled <code>prompt</code>. The earlier manufactured multi-prompt shape was removed. The API key stays server-side and is not included here.</p>
+            <div class="request-id"><small>Full 15s request ID</small><code>019f88ff-1a04-7402-b25f-8a0ae91ca970</code></div>
+          </div>
+          <pre class="payload"><code>{
+  "endpoint": "fal-ai/kling-video/v3/pro/image-to-video",
+  "prompt": "&lt;assembled prompt above&gt;",
+  "start_image_url": "&lt;uploaded try-on still&gt;",
+  "duration": "15",
+  "generate_audio": false,
+  "aspect_ratio": "9:16",
+  "negative_prompt": "blur, distorted face, plastic skin,
+    morphing eyewear, extra fingers, text",
+  "cfg_scale": 0.5
+}</code></pre>
+        </article>
+
+        <article class="run-step">
+          <div class="step-marker"><span>07</span><small>Queue + poll</small></div>
+          <div class="step-copy">
+            <p class="step-kicker">Submit → wait → download</p>
+            <h3>Track the provider job and retain the audit trail.</h3>
+            <p>The adapter submitted the job, polled the request ID, downloaded the returned MP4 and generated QC evidence beside the output.</p>
+            <div class="trace-links">
+              <a href="assets/run-trace/pm-fal-245787-e31/full-run.log" target="_blank">Open raw run log ↗</a>
+              <a href="assets/run-trace/pm-fal-245787-e31/run-manifest.json" target="_blank">Open complete run manifest ↗</a>
+              <a href="code/pm/modelling.py" target="_blank">Open current orchestration code ↗</a>
+            </div>
+          </div>
+          <div class="log-window" aria-label="Actual run log">
+            <div><span></span><span></span><span></span><b>full-run.log</b></div>
+            <pre>product: DSC_2962.jpg | E31_porto | kling3_0 via fal
+A3.1/Office | 1 take
+try-on still DONE | QC generated
+fal.ai submitted → 019f88ff-1a04-7402-b25f-8a0ae91ca970
+take 1 [A3.1_Office] DONE + QC
+complete.</pre>
+          </div>
+          <aside class="trace-caveat">
+            <strong>Validation caveat</strong>
+            <p>The full run called <code>run_modelling(...)</code>, but the test harness reused the already-generated pass-two still. It validates model routing, submit, poll, download and QC—not a literal end-to-end browser click.</p>
+          </aside>
+        </article>
+
+        <article class="run-step run-output">
+          <div class="step-marker"><span>08</span><small>Output + review</small></div>
+          <div class="step-copy">
+            <p class="step-kicker">Technical completion ≠ creative success</p>
+            <h3>Review the exact returned video.</h3>
+            <p>The file is technically valid: H.264, 1072 × 1928, 15.042 seconds. It still fails the creative bar. This distinction matters—the pipeline can execute correctly while the prompt, start frame or model choice produces unusable work.</p>
+          </div>
+          <div class="output-review">
+            <div class="output-video">
+              <video controls playsinline preload="metadata" poster="assets/run-trace/pm-fal-245787-e31/07-video-qc.jpg">
+                <source src="assets/run-trace/pm-fal-245787-e31/06-final-output-rejected.mp4" type="video/mp4">
+              </video>
+            </div>
+            <figure><img src="assets/run-trace/pm-fal-245787-e31/07-video-qc.jpg" alt="Contact sheet from the rejected final PM video"><figcaption><b>QC contact sheet</b><span>Sampled frames from the returned 15-second file</span></figcaption></figure>
+          </div>
+          <div class="final-assessment">
+            <strong>REJECTED</strong>
+            <div>
+              <h4>What worked</h4>
+              <p>Character/PID resolution, fal authentication, still upload, explicit 9:16 request, Kling queue, download and QC artifact creation.</p>
+            </div>
+            <div>
+              <h4>What needs correction</h4>
+              <p>Do not manually wave through a failed fit gate. Reduce one take to 3–4 coherent motion beats. Make the UI perform and record the complete run without a reused-still test hook. Then compare Kling and a policy-compatible second provider on the same approved start frame.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="deep section" id="pm-deep" data-section="09">
+      <div class="section-number">09</div>
       <div class="deep-title"><h2>PM Tool—in depth.</h2><p>One-shot product modelling with preflight fidelity, parallel generations and visible QC evidence.</p></div>
       <div class="pipeline" aria-label="PM tool pipeline"><span>PID + character</span><b>→</b><span>Scene + clothing</span><b>→</b><span>Try-on still</span><b>→</b><span>Model route</span><b>→</b><span>Parallel takes</span><b>→</b><span>QC + export</span></div>
       <div class="tool-links"><span class="local-runtime" title="The PM Tool runs on the production workstation">PM Tool · local runtime</span><a href="code/pm/app.py" target="_blank">View app.py ↗</a><a href="code/pm/modelling.py" target="_blank">View orchestration ↗</a></div>
@@ -251,8 +444,8 @@ log("take failed; continue remaining jobs")</code></pre></div></details>
       </div>
     </section>
 
-    <section class="deep th section" id="th-deep" data-section="09">
-      <div class="section-number">09</div>
+    <section class="deep th section" id="th-deep" data-section="10">
+      <div class="section-number">10</div>
       <div class="deep-title"><h2>TH Tool—in depth.</h2><p>A gated three-stage system: approve the idea, approve the footage, then let deterministic code finish the edit.</p></div>
       <div class="pipeline th-pipe" aria-label="TH tool pipeline"><span>Script + stills</span><b>→</b><span>Gate 1</span><b>→</b><span>Talking + B-roll</span><b>→</b><span>Gate 2</span><b>→</b><span>Stitch</span><b>→</b><span>Voice + export</span></div>
       <div class="tool-links th-links"><span class="local-runtime" title="The TH Tool runs on the production workstation">TH Tool · local runtime</span><a href="code/th/app.py" target="_blank">View app.py ↗</a><a href="code/th/th_pipeline.py" target="_blank">View orchestration ↗</a><a href="code/th/stitcher.py" target="_blank">View stitcher ↗</a></div>
@@ -314,8 +507,8 @@ status = "OK" if drift_ms &lt;= 60 else "CHECK LIP-SYNC"</code></pre></div></det
       </div>
     </section>
 
-    <section class="motion section" id="motion" data-section="10">
-      <div class="section-number">10</div>
+    <section class="motion section" id="motion" data-section="11">
+      <div class="section-number">11</div>
       <div class="section-heading"><h2>What else does Manny do?</h2><p>Production does not end when the model returns a clip.</p></div>
       <div class="motion-grid">
         <article><span>01</span><div class="motion-media work-preview"><video muted autoplay loop playsinline preload="metadata" poster="assets/manny-work/product-modelling-video-editing/web/screen-recording.jpg"><source src="assets/manny-work/product-modelling-video-editing/web/screen-recording.mp4" type="video/mp4"></video></div><h3>Product modelling + video editing</h3><p>From tool operation and generation through the final editing workflow.</p><button type="button" data-library="editing">Watch screen recording ↗</button></article>
@@ -324,8 +517,8 @@ status = "OK" if drift_ms &lt;= 60 else "CHECK LIP-SYNC"</code></pre></div></det
       </div>
     </section>
 
-    <footer class="closing section" id="thoughts" data-section="11">
-      <div class="section-number">11</div>
+    <footer class="closing section" id="thoughts" data-section="12">
+      <div class="section-number">12</div>
       <h2>Your thoughts?</h2>
       <p>We’re building fast, learning in public and keeping the system honest. What should we prioritize next: model quality, orchestration or scale?</p>
       <button type="button" data-review-open data-review-section="Overall feedback">Share feedback ↗</button>
@@ -346,7 +539,7 @@ status = "OK" if drift_ms &lt;= 60 else "CHECK LIP-SYNC"</code></pre></div></det
     <div class="dialog-bar"><div><small>Local review workspace</small><h2>Review notes</h2></div><button type="button" data-dialog-close aria-label="Close review notes">Close</button></div>
     <form id="reviewForm">
       <label for="reviewSection">Section</label>
-      <select id="reviewSection" required><option>Overall feedback</option><option>Video outputs</option><option>Automation progress</option><option>Investment</option><option>PM Tool</option><option>TH Tool</option><option>Motion work</option></select>
+      <select id="reviewSection" required><option>Overall feedback</option><option>Video outputs</option><option>Automation progress</option><option>Investment</option><option>Actual PM run trace</option><option>PM Tool</option><option>TH Tool</option><option>Motion work</option></select>
       <label for="reviewNote">Note or question</label>
       <textarea id="reviewNote" rows="5" placeholder="What should change, be clarified or be added?" required></textarea>
       <button type="submit">Save note</button>
