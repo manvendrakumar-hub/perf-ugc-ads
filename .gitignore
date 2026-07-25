@@ -40,3 +40,6 @@ Video ref/
 
 # QA thumbnail frames (scratch)
 **/_frames/
+
+# Standalone website repository (kept locally as a nested Git checkout)
+/MANNY's UGC SYSTEM/
