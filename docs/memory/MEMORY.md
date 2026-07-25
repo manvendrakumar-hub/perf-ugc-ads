@@ -1,3 +1,6 @@
+# Current Codex handoff
+- [Codex session memory — 2026-07-25](codex-session-memory-2026-07-25.md) — standalone public website repository, automated Vercel deployment, parent-repo separation, and verification.
+
 # Creative (skill: ugc-ads)
 - [UGC Ads System](ugc-ads-system.md) — skill architecture, taxonomy (A=Product-First: A.1 Talking Head LOCKED, A.2 Split Screen, A.3 Modelling; B=Yapping), 15s constraint
 - [UGC Script & Voice Rules](ugc-script-voice-rules.md) — locked: no "sasta", "Lens Kart" spelling, short Gen-Z, use-case, approval gate
